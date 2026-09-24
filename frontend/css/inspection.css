@@ -1,0 +1,387 @@
+/* =====================================================
+   Inspection Page
+===================================================== */
+
+.inspection-container {
+    max-width: 1200px;
+}
+
+
+/* =====================================================
+   Mode Buttons
+===================================================== */
+
+.mode-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+
+.mode-button {
+    border: none;
+    background: white;
+    border: 1px solid #e5e7eb;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+.mode-button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+
+/* =====================================================
+   Inspection Mode
+===================================================== */
+
+.inspection-mode {
+    display: none;
+}
+
+
+.active-mode {
+    display: block;
+}
+
+
+/* =====================================================
+   Upload
+===================================================== */
+
+.upload-box {
+    background: white;
+    border: 2px dashed #d1d5db;
+    border-radius: 14px;
+    padding: 55px 30px;
+    text-align: center;
+}
+
+
+.upload-icon {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: auto auto 15px;
+
+    border-radius: 50%;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 25px;
+}
+
+
+.upload-box h2 {
+    margin-bottom: 8px;
+}
+
+
+.upload-box p {
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+
+#pcbFile {
+    display: none;
+}
+
+
+.choose-button {
+    display: inline-block;
+
+    background: #2563eb;
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+
+.selected-file {
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   Preview
+===================================================== */
+
+.preview-container {
+    margin-top: 25px;
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e5e7eb;
+
+    text-align: center;
+}
+
+
+.preview-container img {
+    max-width: 100%;
+    max-height: 500px;
+
+    display: block;
+
+    margin: 20px auto;
+}
+
+
+.primary-button,
+.secondary-button {
+    border: none;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+
+.primary-button {
+    background: #2563eb;
+    color: white;
+}
+
+
+.secondary-button {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+
+.primary-button:disabled,
+.secondary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   Camera
+===================================================== */
+
+.camera-box {
+    position: relative;
+
+    background: #111827;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    min-height: 500px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+#cameraVideo {
+    width: 100%;
+    max-height: 650px;
+
+    object-fit: contain;
+}
+
+
+.camera-placeholder {
+    position: absolute;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+
+.camera-controls {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 18px;
+}
+
+
+/* =====================================================
+   Result
+===================================================== */
+
+.result-section {
+    margin-top: 30px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 25px;
+}
+
+
+.result-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+
+.result-status {
+    padding: 9px 15px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+.result-status.defective {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+.result-status.normal {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
+.result-grid {
+    display: grid;
+
+    grid-template-columns:
+        1.4fr 1fr;
+
+    gap: 25px;
+}
+
+
+.result-image-card,
+.result-details {
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    padding: 18px;
+}
+
+
+.result-image-card img {
+    width: 100%;
+
+    margin-top: 15px;
+
+    border-radius: 8px;
+}
+
+
+.result-summary {
+    background: #f8fafc;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    margin-bottom: 15px;
+}
+
+
+.result-summary span {
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+}
+
+
+.result-summary strong {
+    font-size: 30px;
+}
+
+
+.defect-item {
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    padding: 13px;
+
+    margin-bottom: 10px;
+}
+
+
+.defect-name {
+    font-weight: bold;
+
+    margin-bottom: 5px;
+}
+
+
+.defect-confidence {
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =====================================================
+   Responsive
+===================================================== */
+
+@media (max-width: 800px) {
+
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .camera-controls {
+        flex-wrap: wrap;
+    }
+
+}

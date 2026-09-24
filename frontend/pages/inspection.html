@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>PCB Inspection</title>
+
+    <link
+        rel="stylesheet"
+        href="/frontend/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/frontend/css/inspection.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================================
+         Sidebar
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                PCB
+            </div>
+
+            <div>
+
+                <h2>PCB AI</h2>
+
+                <span>Inspection System</span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a
+                href="/"
+                class="nav-item"
+            >
+                Dashboard
+            </a>
+
+            <a
+                href="/frontend/pages/inspection.html"
+                class="nav-item active"
+            >
+                PCB Inspection
+            </a>
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+                Products
+            </a>
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+                History
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =================================================
+         Main Content
+    ================================================== -->
+
+    <main class="main-content">
+
+        <header class="top-header">
+
+            <div>
+
+                <p class="page-label">
+                    AI QUALITY CONTROL
+                </p>
+
+                <h1>
+                    PCB Inspection
+                </h1>
+
+            </div>
+
+            <div class="header-status">
+
+                <span class="status-dot"></span>
+
+                FastAPI Connected
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             Inspection Mode
+        ================================================== -->
+
+        <section class="inspection-container">
+
+
+            <div class="mode-buttons">
+
+                <button
+                    id="uploadModeBtn"
+                    class="mode-button active"
+                >
+                    Upload PCB
+                </button>
+
+                <button
+                    id="cameraModeBtn"
+                    class="mode-button"
+                >
+                    Camera Scan
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 Upload Mode
+            ================================================== -->
+
+            <div
+                id="uploadMode"
+                class="inspection-mode active-mode"
+            >
+
+                <div class="upload-box">
+
+                    <div class="upload-icon">
+                        +
+                    </div>
+
+                    <h2>
+                        Upload PCB Image
+                    </h2>
+
+                    <p>
+                        Select a PCB image for AI
+                        defect inspection.
+                    </p>
+
+                    <input
+                        type="file"
+                        id="pcbFile"
+                        accept="image/*"
+                    >
+
+                    <label
+                        for="pcbFile"
+                        class="choose-button"
+                    >
+                        Choose PCB Image
+                    </label>
+
+                    <p
+                        id="selectedFile"
+                        class="selected-file"
+                    >
+                        No image selected
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="uploadPreviewContainer"
+                    class="preview-container hidden"
+                >
+
+                    <h3>
+                        Selected PCB
+                    </h3>
+
+                    <img
+                        id="uploadPreview"
+                        alt="PCB Preview"
+                    >
+
+                    <button
+                        id="inspectUploadBtn"
+                        class="primary-button"
+                    >
+                        Inspect PCB
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 Camera Mode
+            ================================================== -->
+
+            <div
+                id="cameraMode"
+                class="inspection-mode"
+            >
+
+                <div class="camera-box">
+
+                    <video
+                        id="cameraVideo"
+                        autoplay
+                        playsinline
+                    ></video>
+
+                    <div
+                        id="cameraPlaceholder"
+                        class="camera-placeholder"
+                    >
+                        Camera is not started
+                    </div>
+
+                </div>
+
+
+                <div class="camera-controls">
+
+                    <button
+                        id="startCameraBtn"
+                        class="primary-button"
+                    >
+                        Open Camera
+                    </button>
+
+                    <button
+                        id="scanCameraBtn"
+                        class="primary-button"
+                        disabled
+                    >
+                        Scan PCB
+                    </button>
+
+                    <button
+                        id="stopCameraBtn"
+                        class="secondary-button"
+                        disabled
+                    >
+                        Stop Camera
+                    </button>
+
+                </div>
+
+
+                <canvas
+                    id="cameraCanvas"
+                    class="hidden"
+                ></canvas>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 Result
+            ================================================== -->
+
+            <section
+                id="resultSection"
+                class="result-section hidden"
+            >
+
+                <div class="result-header">
+
+                    <div>
+
+                        <p class="section-label">
+                            AI RESULT
+                        </p>
+
+                        <h2>
+                            Inspection Result
+                        </h2>
+
+                    </div>
+
+                    <span
+                        id="resultStatus"
+                        class="result-status"
+                    >
+                        -
+                    </span>
+
+                </div>
+
+
+                <div class="result-grid">
+
+
+                    <div class="result-image-card">
+
+                        <h3>
+                            AI Prediction
+                        </h3>
+
+                        <img
+                            id="predictionImage"
+                            alt="AI Prediction"
+                        >
+
+                    </div>
+
+
+                    <div class="result-details">
+
+                        <div class="result-summary">
+
+                            <span>
+                                Total Defects
+                            </span>
+
+                            <strong
+                                id="totalDefects"
+                            >
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div
+                            id="defectList"
+                            class="defect-list"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <script
+        src="/frontend/js/inspection.js"
+    ></script>
+
+</body>
+
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =================================================
+         Page Configuration
+    ================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>PCB AI Inspection System</title>
+
+
+    <!-- =================================================
+         Main CSS
+    ================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="/frontend/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================================
+         Sidebar
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                PCB
+            </div>
+
+            <div>
+
+                <h2>PCB AI</h2>
+
+                <span>Inspection System</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             Navigation
+        ================================================== -->
+
+        <nav class="navigation">
+
+            <a
+                href="/"
+                class="nav-item active"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="/frontend/pages/inspection.html?mode=upload"
+                class="nav-item"
+            >
+                PCB Inspection
+            </a>
+
+
+            <a
+                href="/frontend/pages/inspection.html?mode=camera"
+                class="nav-item"
+            >
+                Camera Scan
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+                Products
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+                Inspection History
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+                Analytics
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+                Machine Monitoring
+            </a>
+
+        </nav>
+
+
+        <!-- =================================================
+             System Status
+        ================================================== -->
+
+        <div class="system-status">
+
+            <span class="status-dot"></span>
+
+            <span>System Online</span>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =================================================
+         Main Content
+    ================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             Header
+        ================================================== -->
+
+        <header class="top-header">
+
+            <div>
+
+                <p class="page-label">
+                    AI QUALITY CONTROL
+                </p>
+
+                <h1>
+                    PCB Inspection Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="header-status">
+
+                <span class="status-dot"></span>
+
+                FastAPI Connected
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             Statistics
+        ================================================== -->
+
+        <section class="stats-grid">
+
+
+            <!-- Total Inspections -->
+
+            <div class="stat-card">
+
+                <span class="stat-title">
+                    Total Inspections
+                </span>
+
+                <strong id="totalInspections">
+                    0
+                </strong>
+
+                <span class="stat-description">
+                    PCB inspections completed
+                </span>
+
+            </div>
+
+
+            <!-- Defective Inspections -->
+
+            <div class="stat-card">
+
+                <span class="stat-title">
+                    Defective PCBs
+                </span>
+
+                <strong id="defectivePcbs">
+                    0
+                </strong>
+
+                <span class="stat-description">
+                    PCB inspections with defects
+                </span>
+
+            </div>
+
+
+            <!-- Normal Inspections -->
+
+            <div class="stat-card">
+
+                <span class="stat-title">
+                    Normal PCBs
+                </span>
+
+                <strong id="normalPcbs">
+                    0
+                </strong>
+
+                <span class="stat-description">
+                    PCB inspections without defects
+                </span>
+
+            </div>
+
+
+            <!-- Total Defects -->
+
+            <div class="stat-card">
+
+                <span class="stat-title">
+                    Total Defects
+                </span>
+
+                <strong id="totalDefects">
+                    0
+                </strong>
+
+                <span class="stat-description">
+                    Defects detected by AI
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             Quick Actions
+        ================================================== -->
+
+        <section class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <p class="section-label">
+                        INSPECTION
+                    </p>
+
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="action-grid">
+
+
+                <!-- =================================================
+                     Upload PCB
+                ================================================== -->
+
+                <a
+                    href="/frontend/pages/inspection.html?mode=upload"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        +
+                    </div>
+
+                    <h3>
+                        Upload PCB
+                    </h3>
+
+                    <p>
+                        Upload a PCB image and detect
+                        manufacturing defects using AI.
+                    </p>
+
+                    <span class="action-link">
+                        Start Inspection →
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                     Camera Scan
+                ================================================== -->
+
+                <a
+                    href="/frontend/pages/inspection.html?mode=camera"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        C
+                    </div>
+
+                    <h3>
+                        Camera Scan
+                    </h3>
+
+                    <p>
+                        Open your camera and scan a PCB
+                        for AI defect detection.
+                    </p>
+
+                    <span class="action-link">
+                        Open Camera →
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                     Barcode
+                ================================================== -->
+
+                <a
+                    href="#"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        B
+                    </div>
+
+                    <h3>
+                        Barcode
+                    </h3>
+
+                    <p>
+                        Scan a product barcode and view
+                        its inspection history.
+                    </p>
+
+                    <span class="action-link">
+                        Coming Soon →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             AI Pipeline
+        ================================================== -->
+
+        <section class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <p class="section-label">
+                        SYSTEM
+                    </p>
+
+                    <h2>
+                        AI Inspection Pipeline
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="pipeline">
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        01
+                    </div>
+
+                    <h3>
+                        Image
+                    </h3>
+
+                    <p>
+                        Upload / Camera
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        02
+                    </div>
+
+                    <h3>
+                        FastAPI
+                    </h3>
+
+                    <p>
+                        Backend
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        03
+                    </div>
+
+                    <h3>
+                        OpenCV
+                    </h3>
+
+                    <p>
+                        Image Processing
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        04
+                    </div>
+
+                    <h3>
+                        YOLOv8s
+                    </h3>
+
+                    <p>
+                        Defect Detection
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-arrow">
+                    →
+                </div>
+
+
+                <div class="pipeline-step">
+
+                    <div class="pipeline-number">
+                        05
+                    </div>
+
+                    <h3>
+                        Result
+                    </h3>
+
+                    <p>
+                        Inspection Report
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =================================================
+         Dashboard JavaScript
+    ================================================== -->
+
+     <script src="/frontend/js/dashboard.js"></script>
+
+</body>
+
+</html>

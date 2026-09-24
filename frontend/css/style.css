@@ -1,0 +1,491 @@
+/* =====================================================
+   Global Styles
+===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+
+/* =====================================================
+   Sidebar
+===================================================== */
+
+.sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 250px;
+    height: 100vh;
+
+    background: #111827;
+
+    padding: 28px 18px;
+
+    color: white;
+}
+
+
+.logo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 10px 30px;
+}
+
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    font-weight: bold;
+
+    font-size: 12px;
+}
+
+
+.logo h2 {
+    font-size: 18px;
+}
+
+
+.logo span {
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   Navigation
+===================================================== */
+
+.navigation {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.nav-item {
+    text-decoration: none;
+
+    color: #9ca3af;
+
+    padding: 13px 14px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+
+.nav-item:hover,
+.nav-item.active {
+    background: #1f2937;
+
+    color: white;
+}
+
+
+/* =====================================================
+   System Status
+===================================================== */
+
+.system-status {
+    position: absolute;
+
+    bottom: 25px;
+
+    left: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #9ca3af;
+
+    font-size: 12px;
+}
+
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    display: inline-block;
+}
+
+
+/* =====================================================
+   Main Content
+===================================================== */
+
+.main-content {
+    margin-left: 250px;
+
+    padding: 35px 40px;
+}
+
+
+/* =====================================================
+   Header
+===================================================== */
+
+.top-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 35px;
+}
+
+
+.page-label,
+.section-label {
+    color: #2563eb;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 7px;
+}
+
+
+.top-header h1 {
+    font-size: 28px;
+}
+
+
+.header-status {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 13px;
+
+    color: #4b5563;
+
+    background: white;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+}
+
+
+/* =====================================================
+   Statistics
+===================================================== */
+
+.stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 40px;
+}
+
+
+.stat-card {
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e5e7eb;
+}
+
+
+.stat-title {
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+    margin-bottom: 12px;
+}
+
+
+.stat-card strong {
+    display: block;
+
+    font-size: 28px;
+
+    margin-bottom: 7px;
+}
+
+
+.stat-description {
+    color: #9ca3af;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   Sections
+===================================================== */
+
+.section {
+    margin-bottom: 40px;
+}
+
+
+.section-header {
+    margin-bottom: 18px;
+}
+
+
+.section-header h2 {
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   Action Cards
+===================================================== */
+
+.action-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+
+.action-card {
+    text-decoration: none;
+
+    color: inherit;
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e5e7eb;
+
+    transition: 0.2s;
+}
+
+
+.action-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #2563eb;
+}
+
+
+.action-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-weight: bold;
+
+    margin-bottom: 18px;
+}
+
+
+.action-card h3 {
+    margin-bottom: 9px;
+
+    font-size: 17px;
+}
+
+
+.action-card p {
+    color: #6b7280;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    margin-bottom: 18px;
+}
+
+
+.action-link {
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   Pipeline
+===================================================== */
+
+.pipeline {
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+.pipeline-step {
+    text-align: center;
+
+    min-width: 130px;
+}
+
+
+.pipeline-number {
+    width: 40px;
+    height: 40px;
+
+    margin: 0 auto 10px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+
+.pipeline-step h3 {
+    font-size: 14px;
+
+    margin-bottom: 5px;
+}
+
+
+.pipeline-step p {
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+
+.pipeline-arrow {
+    color: #9ca3af;
+
+    font-size: 22px;
+}
+
+
+/* =====================================================
+   Responsive Design
+===================================================== */
+
+@media (max-width: 1000px) {
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .action-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        position: relative;
+
+        width: 100%;
+
+        height: auto;
+    }
+
+    .main-content {
+        margin-left: 0;
+
+        padding: 20px;
+    }
+
+    .pipeline {
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+    .pipeline-arrow {
+        transform: rotate(90deg);
+    }
+
+}
