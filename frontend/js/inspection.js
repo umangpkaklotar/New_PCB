@@ -91,6 +91,21 @@ const predictionImage =
         "predictionImage"
     );
 
+const resultProductId =
+    document.getElementById(
+        "resultProductId"
+    );
+
+const productStatus =
+    document.getElementById(
+        "productStatus"
+    );
+
+const resultBarcode =
+    document.getElementById(
+        "resultBarcode"
+    );
+
 
 // =====================================================
 // Camera Stream
@@ -213,6 +228,12 @@ inspectUploadBtn.addEventListener(
         formData.append(
             "file",
             file
+        );
+        
+        // Generate unique request ID for deduplication
+        formData.append(
+            "inspection_request_id",
+            crypto.randomUUID()
         );
 
         inspectUploadBtn.disabled =
@@ -400,6 +421,12 @@ scanCameraBtn.addEventListener(
                     "file",
                     blob,
                     "camera_pcb.jpg"
+                );
+                
+                // Generate unique request ID for deduplication
+                formData.append(
+                    "inspection_request_id",
+                    crypto.randomUUID()
                 );
 
                 scanCameraBtn.disabled =
@@ -783,13 +810,37 @@ function showInspectionResult(
 
 
     // -------------------------------------------------
-    // Save dashboard statistics
+    // Show Product Info
     // -------------------------------------------------
 
-    saveInspectionStatistics(
-        data
-    );
+    if (data.product) {
+        if (productStatus) {
+            productStatus.textContent = data.message;
+            if (data.message === "Existing PCB detected") {
+                productStatus.style.color = "#3b82f6"; // Blue
+            } else {
+                productStatus.style.color = "#22c55e"; // Green
+            }
+        }
 
+        if (resultProductId) {
+            resultProductId.textContent = data.product.product_id || "-";
+        }
+        if (data.product.barcode) {
+            try {
+                JsBarcode("#resultBarcode", data.product.barcode, {
+                    width: 1.5,
+                    height: 40,
+                    displayValue: true,
+                    background: "transparent",
+                    lineColor: "#000000",
+                    fontSize: 14
+                });
+            } catch (e) {
+                console.error("JsBarcode error:", e);
+            }
+        }
+    }
 
     // -------------------------------------------------
     // Scroll to result
@@ -798,125 +849,6 @@ function showInspectionResult(
     resultSection.scrollIntoView({
         behavior: "smooth"
     });
-
-}
-
-
-// =====================================================
-// Save Dashboard Statistics
-// =====================================================
-
-function saveInspectionStatistics(
-    data
-) {
-
-    let totalInspections =
-        Number(
-            localStorage.getItem(
-                "pcb_total_inspections"
-            )
-        ) || 0;
-
-
-    let defectiveInspections =
-        Number(
-            localStorage.getItem(
-                "pcb_defective_inspections"
-            )
-        ) || 0;
-
-
-    let normalInspections =
-        Number(
-            localStorage.getItem(
-                "pcb_normal_inspections"
-            )
-        ) || 0;
-
-
-    let totalDefects =
-        Number(
-            localStorage.getItem(
-                "pcb_total_defects"
-            )
-        ) || 0;
-
-
-    // -------------------------------------------------
-    // Add one inspection
-    // -------------------------------------------------
-
-    totalInspections += 1;
-
-
-    // -------------------------------------------------
-    // Defective / Normal
-    // -------------------------------------------------
-
-    if (
-        data.status === "defective"
-    ) {
-
-        defectiveInspections += 1;
-
-    } else {
-
-        normalInspections += 1;
-
-    }
-
-
-    // -------------------------------------------------
-    // Add all actual YOLO detections
-    // -------------------------------------------------
-
-    totalDefects +=
-        Number(
-            data.total_defects
-        ) || 0;
-
-
-    // -------------------------------------------------
-    // Save
-    // -------------------------------------------------
-
-    localStorage.setItem(
-        "pcb_total_inspections",
-        totalInspections
-    );
-
-
-    localStorage.setItem(
-        "pcb_defective_inspections",
-        defectiveInspections
-    );
-
-
-    localStorage.setItem(
-        "pcb_normal_inspections",
-        normalInspections
-    );
-
-
-    localStorage.setItem(
-        "pcb_total_defects",
-        totalDefects
-    );
-
-
-    // -------------------------------------------------
-    // Debug
-    // -------------------------------------------------
-
-    console.log(
-        "Dashboard statistics updated:",
-        {
-            totalInspections,
-            defectiveInspections,
-            normalInspections,
-            totalDefects
-        }
-    );
 
 }
 

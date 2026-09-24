@@ -22,6 +22,8 @@
         href="/frontend/css/inspection.css"
     >
 
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
 </head>
 
 
@@ -335,6 +337,20 @@
 
 
                     <div class="result-details">
+
+                        <div class="result-summary">
+
+                            <span>
+                                Product Info
+                            </span>
+
+                            <div style="text-align: right;">
+                                <div id="productStatus" style="font-size: 12px; font-weight: bold; margin-bottom: 4px;"></div>
+                                <div id="resultProductId" style="font-size: 14px; color: #a1a1aa; margin-bottom: 8px;">-</div>
+                                <svg id="resultBarcode"></svg>
+                            </div>
+
+                        </div>
 
                         <div class="result-summary">
 

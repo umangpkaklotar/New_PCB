@@ -8,45 +8,24 @@
 // Get Stored Statistics
 // =====================================================
 
-function getInspectionStats() {
+async function getInspectionStats() {
 
-    const stats = {
+    try {
+        const response = await fetch('/api/dashboard/stats');
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (error) {
+        console.error("Failed to fetch stats from API", error);
+    }
 
-        totalInspections:
-            Number(
-                localStorage.getItem(
-                    "pcb_total_inspections"
-                )
-            ) || 0,
-
-
-        defectivePcb:
-            Number(
-                localStorage.getItem(
-                    "pcb_defective_inspections"
-                )
-            ) || 0,
-
-
-        normalPcb:
-            Number(
-                localStorage.getItem(
-                    "pcb_normal_inspections"
-                )
-            ) || 0,
-
-
-        totalDefects:
-            Number(
-                localStorage.getItem(
-                    "pcb_total_defects"
-                )
-            ) || 0
-
+    return {
+        totalInspections: 0,
+        defectivePcb: 0,
+        normalPcb: 0,
+        totalDefects: 0
     };
 
-
-    return stats;
 }
 
 
@@ -54,10 +33,9 @@ function getInspectionStats() {
 // Display Statistics on Dashboard
 // =====================================================
 
-function displayDashboardStats() {
+async function displayDashboardStats() {
 
-    const stats =
-        getInspectionStats();
+    const stats = await getInspectionStats();
 
 
     // -------------------------------------------------

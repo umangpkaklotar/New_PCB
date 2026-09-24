@@ -10,12 +10,38 @@ from fastapi import (
     APIRouter,
     File,
     UploadFile,
-    HTTPException
+    HTTPException,
+    Form
+)
+from typing import Optional
+
+from backend.app.db.database import (
+    get_or_create_product,
+    save_inspection
 )
 
 from backend.app.services.pcb_detector import (
     predict_pcb
 )
+
+import cv2
+import numpy as np
+
+def compute_phash(image_path: str) -> str:
+    image = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
+    if image is None:
+        return ""
+    resized = cv2.resize(image, (32, 32))
+    dct = cv2.dct(np.float32(resized))
+    dctlowfreq = dct[0:8, 0:8]
+    med = np.median(dctlowfreq)
+    diff = dctlowfreq > med
+    
+    hash_val = 0
+    for i, v in enumerate(diff.flatten()):
+        if v:
+            hash_val += 1 << i
+    return hex(hash_val)[2:].zfill(16)
 
 
 # ---------------------------------------------------------
@@ -54,7 +80,9 @@ UPLOAD_DIR.mkdir(
 
 @router.post("/predict")
 async def inspect_pcb(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    product_id: Optional[str] = Form(None),
+    inspection_request_id: str = Form(...)
 ):
 
     # -----------------------------------------------------
@@ -119,7 +147,6 @@ async def inspect_pcb(
 
     file_data = await file.read()
 
-
     # -----------------------------------------------------
     # Save image
     # -----------------------------------------------------
@@ -178,13 +205,53 @@ async def inspect_pcb(
 
 
     # -----------------------------------------------------
+    # Save to MongoDB
+    # -----------------------------------------------------
+
+    image_hash = compute_phash(str(image_path))
+    product, is_new = get_or_create_product(product_id, image_hash)
+    
+    # Initialize defect counts
+    defect_counts = {
+        "copper": 0,
+        "mousebite": 0,
+        "open": 0,
+        "pin-hole": 0,
+        "short": 0,
+        "spur": 0,
+        "missing_hole": 0
+    }
+    
+    for defect in prediction["defects"]:
+        cls_name = defect["class_name"]
+        if cls_name in defect_counts:
+            defect_counts[cls_name] += 1
+            
+    # Check if from camera based on filename
+    inspection_method = "camera" if file.filename == "camera_pcb.jpg" else "upload"
+    
+    inspection_record = {
+        "inspection_request_id": inspection_request_id,
+        "product_id": product["product_id"],
+        "inspection_method": inspection_method,
+        "status": prediction["status"],
+        "total_defects": prediction["total_defects"],
+        "defect_counts": defect_counts,
+        "original_image": prediction["original_image"],
+        "prediction_image": prediction["prediction_image"]
+    }
+    
+    save_inspection(inspection_record)
+
+
+    # -----------------------------------------------------
     # Return response
     # -----------------------------------------------------
 
     return {
 
         "message":
-            "PCB inspection completed successfully",
+            "New PCB registered" if is_new else "Existing PCB detected",
 
         "filename":
             file.filename,
@@ -199,5 +266,7 @@ async def inspect_pcb(
             prediction["defects"],
 
         "prediction_image":
-            prediction_url
+            prediction_url,
+            
+        "product": product
     }

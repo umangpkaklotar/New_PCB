@@ -13,6 +13,10 @@ from backend.app.api.inspection import (
     router as inspection_router
 )
 
+from backend.app.api.dashboard import (
+    router as dashboard_router
+)
+
 
 # ---------------------------------------------------------
 # Project root directory
@@ -59,6 +63,10 @@ app = FastAPI(
 
 app.include_router(
     inspection_router
+)
+
+app.include_router(
+    dashboard_router
 )
 
 
