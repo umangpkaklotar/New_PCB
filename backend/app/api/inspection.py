@@ -21,27 +21,15 @@ from backend.app.db.database import (
 )
 
 from backend.app.services.pcb_detector import (
-    predict_pcb
+    predict_pcb,
+    compute_phash
 )
 
 import cv2
 import numpy as np
 
-def compute_phash(image_path: str) -> str:
-    image = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
-    if image is None:
-        return ""
-    resized = cv2.resize(image, (32, 32))
-    dct = cv2.dct(np.float32(resized))
-    dctlowfreq = dct[0:8, 0:8]
-    med = np.median(dctlowfreq)
-    diff = dctlowfreq > med
-    
-    hash_val = 0
-    for i, v in enumerate(diff.flatten()):
-        if v:
-            hash_val += 1 << i
-    return hex(hash_val)[2:].zfill(16)
+import cv2
+import numpy as np
 
 
 # ---------------------------------------------------------
@@ -49,11 +37,38 @@ def compute_phash(image_path: str) -> str:
 # ---------------------------------------------------------
 
 router = APIRouter(
-
     prefix="/api/inspection",
-
     tags=["PCB Inspection"]
 )
+
+from backend.app.db.database import get_product_by_barcode, inspections_collection, find_matching_pcb_by_hash
+
+@router.get("/barcode/{barcode}")
+async def fetch_pcb_by_barcode(barcode: str):
+    product, is_new = get_or_create_product(barcode)
+    
+    if is_new:
+        return {
+            "message": "New PCB registered",
+            "product": product
+        }
+        
+    latest_inspection = inspections_collection.find_one(
+        {"product_id": product["product_id"]}, 
+        sort=[("created_at", -1)]
+    )
+    
+    response = {
+        "message": "Existing PCB details loaded",
+        "product": product
+    }
+    
+    if latest_inspection:
+        if "_id" in latest_inspection:
+            del latest_inspection["_id"]
+        response["latest_inspection"] = latest_inspection
+        
+    return response
 
 
 # ---------------------------------------------------------
@@ -160,6 +175,29 @@ async def inspect_pcb(
             file_data
         )
 
+    # -----------------------------------------------------
+    # Check for duplicate PCB using image hash
+    # -----------------------------------------------------
+    
+    image_hash = compute_phash(str(image_path))
+    existing_inspection, existing_product = find_matching_pcb_by_hash(image_hash)
+    
+    if existing_inspection and existing_product:
+        # Match found, delete the newly uploaded image to save space
+        if image_path.exists():
+            image_path.unlink()
+            
+        return {
+            "message": "Existing PCB detected",
+            "filename": file.filename,
+            "status": existing_inspection.get("status", "unknown"),
+            "total_defects": existing_inspection.get("total_defects", 0),
+            "defects": existing_inspection.get("defects", []),
+            "prediction_image": existing_inspection.get("prediction_image", ""),
+            "product": existing_product,
+            "inspection_method": existing_inspection.get("inspection_method", "unknown"),
+            "created_at": existing_inspection.get("created_at")
+        }
 
     # -----------------------------------------------------
     # Run YOLO prediction
@@ -208,8 +246,7 @@ async def inspect_pcb(
     # Save to MongoDB
     # -----------------------------------------------------
 
-    image_hash = compute_phash(str(image_path))
-    product, is_new = get_or_create_product(product_id, image_hash)
+    product, is_new = get_or_create_product(product_id)
     
     # Initialize defect counts
     defect_counts = {
@@ -237,8 +274,10 @@ async def inspect_pcb(
         "status": prediction["status"],
         "total_defects": prediction["total_defects"],
         "defect_counts": defect_counts,
+        "defects": prediction["defects"],
         "original_image": prediction["original_image"],
-        "prediction_image": prediction["prediction_image"]
+        "prediction_image": prediction_url,
+        "image_hash": image_hash
     }
     
     save_inspection(inspection_record)
@@ -268,5 +307,8 @@ async def inspect_pcb(
         "prediction_image":
             prediction_url,
             
-        "product": product
+        "product": product,
+        
+        "inspection_method": inspection_method,
+        "created_at": inspection_record.get("created_at")
     }

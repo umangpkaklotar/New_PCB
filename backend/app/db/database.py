@@ -20,40 +20,18 @@ products_collection.create_index("product_id", unique=True)
 products_collection.create_index("barcode", unique=True)
 inspections_collection.create_index("inspection_request_id", unique=True, sparse=True)
 
-def hamming_distance(hash1: str, hash2: str) -> int:
-    try:
-        val = int(hash1, 16) ^ int(hash2, 16)
-        return bin(val).count('1')
-    except:
-        return 999
+def get_product_by_barcode(barcode: str):
+    product = products_collection.find_one({"barcode": barcode})
+    if product:
+        if "_id" in product:
+            del product["_id"]
+        if "created_at" in product and isinstance(product["created_at"], datetime):
+            product["created_at"] = product["created_at"].isoformat()
+    return product
 
-def find_product_by_hash(image_hash: str, threshold: int = 10):
-    if not image_hash:
-        return None
-        
-    best_match = None
-    min_dist = float('inf')
-    
-    for product in products_collection.find({"image_hash": {"$exists": True}}):
-        dist = hamming_distance(image_hash, product.get("image_hash", ""))
-        if dist <= threshold and dist < min_dist:
-            min_dist = dist
-            best_match = product
-            
-    return best_match
-
-def get_or_create_product(product_id: str = None, image_hash: str = None):
-    if product_id:
-        product = products_collection.find_one({"product_id": product_id})
-        if product:
-            if "_id" in product:
-                del product["_id"]
-            if "created_at" in product and isinstance(product["created_at"], datetime):
-                product["created_at"] = product["created_at"].isoformat()
-            return product, False
-            
-    if image_hash:
-        product = find_product_by_hash(image_hash)
+def get_or_create_product(barcode: str = None):
+    if barcode:
+        product = products_collection.find_one({"barcode": barcode})
         if product:
             if "_id" in product:
                 del product["_id"]
@@ -75,15 +53,24 @@ def get_or_create_product(product_id: str = None, image_hash: str = None):
             pass
             
     new_id = f"PCB-{new_num:06d}"
-    barcode = new_id
+    new_barcode = barcode if barcode else new_id
     
     new_product = {
         "product_id": new_id,
-        "barcode": barcode,
-        "image_hash": image_hash,
+        "barcode": new_barcode,
         "created_at": datetime.now(timezone.utc)
     }
-    products_collection.insert_one(new_product)
+    
+    try:
+        products_collection.insert_one(new_product)
+    except Exception:
+        product = products_collection.find_one({"barcode": new_barcode})
+        if product:
+            if "_id" in product:
+                del product["_id"]
+            if "created_at" in product and isinstance(product["created_at"], datetime):
+                product["created_at"] = product["created_at"].isoformat()
+            return product, False
     
     # We return the dict without the '_id' object to avoid JSON serialization issues in FastAPI
     if "_id" in new_product:
@@ -125,3 +112,31 @@ def save_inspection(inspection_data: dict):
             inspection_data["created_at"] = inspection_data["created_at"].isoformat()
             
         return inspection_data
+
+def find_matching_pcb_by_hash(image_hash: str, threshold: int = 10):
+    if not image_hash:
+        return None, None
+        
+    # Find matching hash by calculating Hamming distance
+    cursor = inspections_collection.find({"image_hash": {"$exists": True}}).sort("created_at", -1).limit(1000)
+    for inspection in cursor:
+        db_hash = inspection.get("image_hash")
+        if not db_hash: continue
+        
+        dist = bin(int(image_hash, 16) ^ int(db_hash, 16)).count('1')
+        if dist <= threshold:
+            product = products_collection.find_one({"product_id": inspection["product_id"]})
+            if product:
+                if "_id" in product:
+                    del product["_id"]
+                if "created_at" in product and isinstance(product["created_at"], datetime):
+                    product["created_at"] = product["created_at"].isoformat()
+                    
+            if "_id" in inspection:
+                del inspection["_id"]
+            if "created_at" in inspection and isinstance(inspection["created_at"], datetime):
+                inspection["created_at"] = inspection["created_at"].isoformat()
+                
+            return inspection, product
+            
+    return None, None

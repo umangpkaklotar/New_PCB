@@ -257,3 +257,41 @@ def predict_pcb(
             prediction_image
         )
     }
+
+
+# ---------------------------------------------------------
+# Image Hashing for Duplicate Detection
+# ---------------------------------------------------------
+
+def compute_phash(image_path: str) -> str:
+    """
+    Computes a perceptual hash (pHash) for the given image using OpenCV.
+    This hash can be used to compare visual similarity between images.
+    """
+    image = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
+    if image is None:
+        return ""
+    
+    # Resize to 32x32
+    resized = cv2.resize(image, (32, 32))
+    
+    # Compute Discrete Cosine Transform (DCT)
+    dct = cv2.dct(np.float32(resized))
+    
+    # Take the top-left 8x8 (low frequencies)
+    dct_lowfreq = dct[:8, :8]
+    
+    # Compute median (excluding the first DC term)
+    med = np.median(dct_lowfreq[1:])
+    
+    # Create binary hash
+    diff = dct_lowfreq > med
+    
+    # Convert to 64-bit hex string
+    return hex(int("".join(["1" if b else "0" for b in diff.flatten()]), 2))[2:].zfill(16)
+
+def hamming_distance(hash1: str, hash2: str) -> int:
+    """Calculates the Hamming distance between two hex string hashes."""
+    if not hash1 or not hash2:
+        return 999
+    return bin(int(hash1, 16) ^ int(hash2, 16)).count('1')

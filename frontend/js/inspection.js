@@ -101,17 +101,43 @@ const productStatus =
         "productStatus"
     );
 
-const resultBarcode =
+const resultQRCode =
     document.getElementById(
-        "resultBarcode"
+        "resultQRCode"
     );
 
+const resultMethod =
+    document.getElementById(
+        "resultMethod"
+    );
+
+const resultDate =
+    document.getElementById(
+        "resultDate"
+    );
+
+const barcodeModeBtn =
+    document.getElementById(
+        "barcodeModeBtn"
+    );
+
+const barcodeMode =
+    document.getElementById(
+        "barcodeMode"
+    );
+
+const barcodeError =
+    document.getElementById(
+        "barcodeError"
+    );
 
 // =====================================================
-// Camera Stream
+// Global State
 // =====================================================
 
 let cameraStream = null;
+let html5QrcodeScanner = null;
+let currentProductId = null;
 
 
 // =====================================================
@@ -129,6 +155,10 @@ uploadModeBtn.addEventListener(
         cameraModeBtn.classList.remove(
             "active"
         );
+        
+        barcodeModeBtn.classList.remove(
+            "active"
+        );
 
         uploadMode.classList.add(
             "active-mode"
@@ -137,6 +167,10 @@ uploadModeBtn.addEventListener(
         cameraMode.classList.remove(
             "active-mode"
         );
+        
+        barcodeMode.style.display = "none";
+        
+        stopBarcodeScanner();
 
     }
 );
@@ -157,6 +191,10 @@ cameraModeBtn.addEventListener(
         uploadModeBtn.classList.remove(
             "active"
         );
+        
+        barcodeModeBtn.classList.remove(
+            "active"
+        );
 
         cameraMode.classList.add(
             "active-mode"
@@ -165,6 +203,10 @@ cameraModeBtn.addEventListener(
         uploadMode.classList.remove(
             "active-mode"
         );
+        
+        barcodeMode.style.display = "none";
+        
+        stopBarcodeScanner();
 
     }
 );
@@ -235,6 +277,10 @@ inspectUploadBtn.addEventListener(
             "inspection_request_id",
             crypto.randomUUID()
         );
+        
+        if (currentProductId) {
+            formData.append("product_id", currentProductId);
+        }
 
         inspectUploadBtn.disabled =
             true;
@@ -428,6 +474,10 @@ scanCameraBtn.addEventListener(
                     "inspection_request_id",
                     crypto.randomUUID()
                 );
+                
+                if (currentProductId) {
+                    formData.append("product_id", currentProductId);
+                }
 
                 scanCameraBtn.disabled =
                     true;
@@ -828,16 +878,40 @@ function showInspectionResult(
         }
         if (data.product.barcode) {
             try {
-                JsBarcode("#resultBarcode", data.product.barcode, {
-                    width: 1.5,
-                    height: 40,
-                    displayValue: true,
-                    background: "transparent",
-                    lineColor: "#000000",
-                    fontSize: 14
+                let detailsText = `Product ID: ${data.product.product_id}\n`;
+                detailsText += `Barcode: ${data.product.barcode}\n`;
+                detailsText += `Method: ${data.inspection_method === "camera" ? "Camera Scan" : "Image Upload"}\n`;
+                
+                let dateStr = "-";
+                if (data.created_at) {
+                    dateStr = new Date(data.created_at).toLocaleString();
+                }
+                detailsText += `Date: ${dateStr}\n`;
+                detailsText += `Status: ${data.status}\n`;
+                detailsText += `Total Defects: ${data.total_defects}\n`;
+                
+                if (data.total_defects > 0 && data.defects) {
+                    const grouped = groupDefectsByClass(data.defects);
+                    Object.entries(grouped).forEach(([className, info]) => {
+                        const confs = info.confidences.map(c => (c*100).toFixed(1)+'%').join(', ');
+                        detailsText += `${className} x${info.count} (${confs})\n`;
+                    });
+                }
+                
+                // Clear previous QR code
+                resultQRCode.innerHTML = "";
+                
+                // Generate new QR code (2D Barcode)
+                new QRCode(resultQRCode, {
+                    text: detailsText,
+                    width: 150,
+                    height: 150,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
                 });
             } catch (e) {
-                console.error("JsBarcode error:", e);
+                console.error("QRCode error:", e);
             }
         }
     }
@@ -846,10 +920,114 @@ function showInspectionResult(
     // Scroll to result
     // -------------------------------------------------
 
+    if (resultMethod && data.inspection_method) {
+        resultMethod.textContent = data.inspection_method === "camera" ? "Camera Scan" : "Image Upload";
+    } else if (resultMethod) {
+        resultMethod.textContent = "-";
+    }
+
+    if (resultDate && data.created_at) {
+        const date = new Date(data.created_at);
+        resultDate.textContent = date.toLocaleString();
+    } else if (resultDate) {
+        resultDate.textContent = "-";
+    }
+
     resultSection.scrollIntoView({
         behavior: "smooth"
     });
 
+}
+
+// =====================================================
+// Barcode Scanner Logic
+// =====================================================
+
+barcodeModeBtn.addEventListener("click", () => {
+    uploadModeBtn.classList.remove("active");
+    cameraModeBtn.classList.remove("active");
+    barcodeModeBtn.classList.add("active");
+    
+    uploadMode.classList.remove("active-mode");
+    cameraMode.classList.remove("active-mode");
+    
+    barcodeMode.style.display = "block";
+    uploadMode.style.display = "none";
+    cameraMode.style.display = "none";
+    resultSection.classList.add("hidden");
+    
+    startBarcodeScanner();
+});
+
+function startBarcodeScanner() {
+    if (!html5QrcodeScanner) {
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    }
+}
+
+function stopBarcodeScanner() {
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear().catch(error => {
+            console.error("Failed to clear html5QrcodeScanner. ", error);
+        });
+        html5QrcodeScanner = null;
+    }
+}
+
+async function onScanSuccess(decodedText, decodedResult) {
+    stopBarcodeScanner();
+    
+    try {
+        // Extract Product ID if the scanned text is our formatted 2D barcode text
+        let barcodeId = decodedText;
+        const match = decodedText.match(/Product ID:\s*(PCB-\d+)/);
+        if (match && match[1]) {
+            barcodeId = match[1];
+        } else if (decodedText.startsWith("PCB-")) {
+            barcodeId = decodedText.trim();
+        }
+        
+        const response = await fetch(`/api/inspection/barcode/${encodeURIComponent(barcodeId)}`);
+        
+        if (!response.ok) {
+            const err = await response.json();
+            barcodeError.textContent = err.detail || "PCB not registered";
+            barcodeError.style.display = "block";
+            // Restart scanner after a delay
+            setTimeout(() => {
+                barcodeError.style.display = "none";
+                startBarcodeScanner();
+            }, 3000);
+            return;
+        }
+        
+        const data = await response.json();
+        
+        // Setup data for showInspectionResult
+        currentProductId = data.product.barcode;
+        
+        const mockResultData = {
+            product: data.product,
+            message: data.message,
+            status: data.latest_inspection ? data.latest_inspection.status : "Unknown",
+            total_defects: data.latest_inspection ? data.latest_inspection.total_defects : 0,
+            defects: data.latest_inspection && data.latest_inspection.defects ? data.latest_inspection.defects : [],
+            prediction_image: data.latest_inspection ? data.latest_inspection.prediction_image : "",
+            inspection_method: data.latest_inspection ? data.latest_inspection.inspection_method : null,
+            created_at: data.latest_inspection ? data.latest_inspection.created_at : null
+        };
+        
+        showInspectionResult(mockResultData);
+        resultSection.classList.remove("hidden");
+        
+    } catch (error) {
+        console.error("Scan error:", error);
+    }
+}
+
+function onScanFailure(error) {
+    // handle scan failure, usually better to ignore and keep scanning
 }
 
 
