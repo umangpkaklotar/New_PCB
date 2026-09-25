@@ -239,6 +239,9 @@ pcbFile.addEventListener(
         uploadPreviewContainer.classList.remove(
             "hidden"
         );
+        
+        // Auto-start inspection
+        inspectUploadBtn.click();
 
     }
 );
@@ -286,7 +289,14 @@ inspectUploadBtn.addEventListener(
             true;
 
         inspectUploadBtn.textContent =
-            "Inspecting...";
+            "Processing PCB...";
+            
+        // Make sure button is visible as loading state
+        inspectUploadBtn.style.display = "inline-block";
+        
+        // Clear previous result
+        predictionImage.src = "";
+        predictionImage.alt = "Processing...";
 
         try {
 
@@ -333,6 +343,9 @@ inspectUploadBtn.addEventListener(
 
             inspectUploadBtn.textContent =
                 "Inspect PCB";
+                
+            // Hide button after processing since it's automatic now
+            inspectUploadBtn.style.display = "none";
 
         }
 
@@ -483,7 +496,11 @@ scanCameraBtn.addEventListener(
                     true;
 
                 scanCameraBtn.textContent =
-                    "Scanning...";
+                    "Processing PCB...";
+                    
+                // Clear previous result
+                predictionImage.src = "";
+                predictionImage.alt = "Processing...";
 
                 try {
 

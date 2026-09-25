@@ -176,28 +176,10 @@ async def inspect_pcb(
         )
 
     # -----------------------------------------------------
-    # Check for duplicate PCB using image hash
+    # (Duplicate check removed per requirements)
     # -----------------------------------------------------
     
     image_hash = compute_phash(str(image_path))
-    existing_inspection, existing_product = find_matching_pcb_by_hash(image_hash)
-    
-    if existing_inspection and existing_product:
-        # Match found, delete the newly uploaded image to save space
-        if image_path.exists():
-            image_path.unlink()
-            
-        return {
-            "message": "Existing PCB detected",
-            "filename": file.filename,
-            "status": existing_inspection.get("status", "unknown"),
-            "total_defects": existing_inspection.get("total_defects", 0),
-            "defects": existing_inspection.get("defects", []),
-            "prediction_image": existing_inspection.get("prediction_image", ""),
-            "product": existing_product,
-            "inspection_method": existing_inspection.get("inspection_method", "unknown"),
-            "created_at": existing_inspection.get("created_at")
-        }
 
     # -----------------------------------------------------
     # Run YOLO prediction
