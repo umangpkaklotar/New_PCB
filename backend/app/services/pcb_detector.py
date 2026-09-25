@@ -228,11 +228,31 @@ def predict_pcb(
 
 
     # -----------------------------------------------------
+    # Move output to normal/defective folder
+    # -----------------------------------------------------
+
+    import shutil
+
+    final_output_dir = (
+        PREDICTION_DIR / status / run_id
+    )
+
+    final_output_dir.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    shutil.move(
+        str(output_dir),
+        str(final_output_dir)
+    )
+
+    # -----------------------------------------------------
     # Prediction image path
     # -----------------------------------------------------
 
     prediction_image = (
-        output_dir / image_path.name
+        final_output_dir / image_path.name
     )
 
 
