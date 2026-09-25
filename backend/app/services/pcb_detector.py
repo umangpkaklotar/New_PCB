@@ -7,6 +7,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import cv2
+import numpy as np
 from ultralytics import YOLO
 
 
